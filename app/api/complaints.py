@@ -1,10 +1,11 @@
 from __future__ import annotations
+
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.base import get_db
-from app.models.user import User
+from app.models.user import User, UserRole
 from app.auth.dependencies import get_current_user
 from app.services.complaint_service import ComplaintService
 from app.schemas.complaint import (
@@ -18,20 +19,20 @@ from app.utils.serializers import complaint_to_response, analysis_to_response
 router = APIRouter(prefix="/api/complaints", tags=["Complaints"])
 
 
-@router.post("", response_model=ComplaintResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=ComplaintResponse)
 async def submit_complaint(
-    payload: ComplaintCreateRequest,
+    complaint_data: ComplaintCreateRequest,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
     service = ComplaintService(db)
-    complaint = await service.submit_complaint(
+    result = await service.submit_complaint(
         customer_id=current_user.id,
-        title=payload.title,
-        description=payload.description,
-        policy_number=payload.policy_number,
+        title=complaint_data.title,
+        description=complaint_data.description,
+        policy_number=complaint_data.policy_number,
     )
-    return complaint_to_response(complaint)
+    return complaint_to_response(result)
 
 
 @router.get("/my", response_model=list[ComplaintListItem])
@@ -55,8 +56,6 @@ async def get_complaint(
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found")
 
-    # Customers can only view their own complaints
-    from app.models.user import UserRole
     if current_user.role == UserRole.CUSTOMER and complaint.customer_id != current_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
 
@@ -74,7 +73,6 @@ async def get_complaint_analysis(
     if not complaint:
         raise HTTPException(status_code=404, detail="Complaint not found")
 
-    from app.models.user import UserRole
     if current_user.role == UserRole.CUSTOMER and complaint.customer_id != current_user.id:
         raise HTTPException(status_code=403, detail="Access denied")
 

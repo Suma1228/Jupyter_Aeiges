@@ -9,6 +9,7 @@ Each node is a discrete agent. State flows through the graph.
 
 from __future__ import annotations
 from typing import TypedDict, Any
+from langgraph import graph
 from langgraph.graph import StateGraph, END
 
 from app.agents.llm_provider import LLMProvider, get_llm_provider
@@ -18,6 +19,8 @@ from app.agents.routing import run_routing_agent
 from app.agents.sentiment import run_sentiment_agent
 from app.agents.sla_risk import run_sla_risk_agent
 from app.agents.supervisor import run_supervisor_agent
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -174,21 +177,23 @@ def build_aegis_workflow(llm: LLMProvider | None = None) -> StateGraph:
     graph = StateGraph(AegisState)
 
     # Add nodes
-    graph.add_node("classification", make_classification_node(llm))
-    graph.add_node("priority", make_priority_node(llm))
-    graph.add_node("routing", make_routing_node(llm))
-    graph.add_node("sentiment", make_sentiment_node(llm))
-    graph.add_node("sla_risk", make_sla_risk_node(llm))
-    graph.add_node("supervisor", make_supervisor_node(llm))
+    graph.add_node("classification_agent", make_classification_node(llm))
+    graph.add_node("priority_agent", make_priority_node(llm))
+    graph.add_node("routing_agent", make_routing_node(llm))
+    graph.add_node("sentiment_agent", make_sentiment_node(llm))
+    graph.add_node("sla_risk_agent", make_sla_risk_node(llm))
+    graph.add_node("supervisor_agent", make_supervisor_node(llm))
 
     # Define edges (sequential pipeline)
-    graph.set_entry_point("classification")
-    graph.add_edge("classification", "priority")
-    graph.add_edge("priority", "routing")
-    graph.add_edge("routing", "sentiment")
-    graph.add_edge("sentiment", "sla_risk")
-    graph.add_edge("sla_risk", "supervisor")
-    graph.add_edge("supervisor", END)
+    # Define edges (sequential pipeline)
+    graph.set_entry_point("classification_agent")
+
+    graph.add_edge("classification_agent", "priority_agent")
+    graph.add_edge("priority_agent", "routing_agent")
+    graph.add_edge("routing_agent", "sentiment_agent")
+    graph.add_edge("sentiment_agent", "sla_risk_agent")
+    graph.add_edge("sla_risk_agent", "supervisor_agent")
+    graph.add_edge("supervisor_agent", END)
 
     return graph.compile()
 

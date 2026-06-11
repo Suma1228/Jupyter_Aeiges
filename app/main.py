@@ -12,28 +12,14 @@ from app.db.base import engine, Base
 from app.api import auth, complaints, ops
 
 
-
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite's default port
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifespan: create tables and seed on startup."""
-    # Import all models to register with Base metadata
-    import app.models  # noqa: F401
+    import app.models  # noqa: F401 — registers all models with Base metadata
 
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-    # Seed database with initial data
     from app.db.seed import seed_database
     await seed_database()
 
@@ -49,16 +35,14 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS — allow React frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Tighten for production
+    allow_origins=["http://localhost:5173", "http://localhost:8080"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routers
 app.include_router(auth.router)
 app.include_router(complaints.router)
 app.include_router(ops.router)
