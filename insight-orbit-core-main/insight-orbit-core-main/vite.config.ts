@@ -1,21 +1,17 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+const JUPYTER_BASE = process.env.JUPYTER_BASE_PATH || "/";
+
 export default defineConfig({
   vite: {
-    base: "/jupyter-hack-team-2671-260612052841-847ec4b2/proxy/3000/",
-    server: {
-      allowedHosts: "all",
-    },
+    base: JUPYTER_BASE,
+    server: { allowedHosts: "all" },
   },
   tanstackStart: {
     server: { entry: "server" },
     routers: {
-      client: {
-        base: "/jupyter-hack-team-2671-260612052841-847ec4b2/proxy/3000/",
-      },
-      ssr: {
-        base: "/jupyter-hack-team-2671-260612052841-847ec4b2/proxy/3000/",
-      },
+      client: { base: JUPYTER_BASE },
+      ssr:    { base: JUPYTER_BASE },
     },
   },
 });
