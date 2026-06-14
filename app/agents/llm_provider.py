@@ -184,8 +184,9 @@ class QwenProvider(LLMProvider):
     Set LLM_PROVIDER=qwen and AMD_API_URL in .env.
     """
 
-    def __init__(self, base_url: str, model: str = "qwen2.5-72b-instruct"):
+    def __init__(self, base_url: str, api_key: str = "abc-123", model: str = "Qwen/Qwen2-7B-Instruct"):
         self.base_url = base_url
+        self.api_key = api_key
         self.model = model
 
     async def complete(self, system_prompt: str, user_prompt: str) -> str:
@@ -193,6 +194,7 @@ class QwenProvider(LLMProvider):
         async with httpx.AsyncClient() as client:
             response = await client.post(
                 f"{self.base_url}/v1/chat/completions",
+                headers={"Authorization": f"Bearer {self.api_key}"},
                 json={
                     "model": self.model,
                     "messages": [
@@ -213,7 +215,7 @@ class LlamaProvider(LLMProvider):
     Compatible with OpenAI-style API endpoints (vLLM / Ollama).
     """
 
-    def __init__(self, base_url: str, model: str = "llama-3.1-70b-instruct"):
+    def __init__(self, base_url: str, api_key: str = "abc-123", model: str = "Qwen/Qwen2-7B-Instruct"):
         self.base_url = base_url
         self.model = model
 
@@ -281,7 +283,7 @@ def get_llm_provider() -> LLMProvider:
         return MockProvider()
     elif provider == "qwen":
         import os
-        return QwenProvider(base_url=os.environ.get("AMD_API_URL", "http://localhost:8080"))
+        return QwenProvider(base_url=settings.AMD_API_URL, api_key=settings.AMD_API_KEY, model=settings.AMD_MODEL)
     elif provider == "llama":
         import os
         return LlamaProvider(base_url=os.environ.get("AMD_API_URL", "http://localhost:8080"))
