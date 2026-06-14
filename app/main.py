@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.db.base import engine, Base
 from app.api import auth, complaints, ops
-
+import os
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -35,9 +35,20 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
+JUPYTER_ORIGIN = os.environ.get("JUPYTER_ORIGIN", "")
+
+origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8080",
+]
+if JUPYTER_ORIGIN:
+    origins.append(JUPYTER_ORIGIN)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:8080"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
