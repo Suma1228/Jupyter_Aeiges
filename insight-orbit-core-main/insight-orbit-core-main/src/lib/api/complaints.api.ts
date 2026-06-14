@@ -34,11 +34,11 @@ export const trackComplaint = async (id: number): Promise<Complaint> => {
 
 // Ops APIs
 export const getAllComplaints = async (): Promise<Complaint[]> => {
-  const { data } = await apiClient.get("/complaints/all");
+  const { data } = await apiClient.get("/api/ops/complaints");
   return data;
 };
 
 export const getInsights = async () => {
-  const { data } = await apiClient.get("/complaints/insights");
+  const { data } = await apiClient.get("/api/ops/dashboard");
   return data;
 };
