@@ -24,7 +24,8 @@ type Persona = "customer" | "ops";
 
 // ─── FIXED AUTH REQUEST ─────────────────────────────────────────────
 async function loginRequest(email: string, password: string) {
-  const BASE = import.meta.env.VITE_API_URL || "http://localhost:8002";
+  // Read from env var so you only change it in one place
+  const BASE = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
   const res = await fetch(`${BASE}/api/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
