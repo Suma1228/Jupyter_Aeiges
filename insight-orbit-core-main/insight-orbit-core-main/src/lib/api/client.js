@@ -23,7 +23,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("access_token");
-      window.location.href = "/login";
+      const base = import.meta.env.BASE_URL || "/";
+      window.location.href = base + "login";
     }
     return Promise.reject(error);
   }
