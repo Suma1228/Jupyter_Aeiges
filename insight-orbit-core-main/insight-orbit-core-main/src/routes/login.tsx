@@ -24,15 +24,11 @@ type Persona = "customer" | "ops";
 
 // ─── FIXED AUTH REQUEST ─────────────────────────────────────────────
 async function loginRequest(email: string, password: string) {
-  const res = await fetch("https://notebooks.amd.com/jupyter-hack-team-2671-260612052841-847ec4b2/proxy/8002/api/auth/login", {
+  const BASE = import.meta.env.VITE_API_URL || "http://localhost:8002";
+  const res = await fetch(`${BASE}/api/auth/login`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
   });
 
   if (!res.ok) {
