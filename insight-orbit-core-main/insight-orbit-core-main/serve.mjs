@@ -2,7 +2,7 @@ import http from "http";
 import fs from "fs";
 import path from "path";
 
-const BASE = "/jupyter-hack-team-2671-260612052841-847ec4b2/proxy/3000";
+const BASE = process.env.JUPYTER_BASE_PATH?.replace(/\/$/, "") || "";
 const DIST = "./dist/client";
 
 const mime = {
