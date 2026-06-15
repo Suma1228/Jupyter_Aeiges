@@ -31,6 +31,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Aegis — AI Insurance Complaint Engine",
     description="AI-powered complaint classification, routing, and analysis backend.",
+    root_path=os.getenv("ROOT_PATH", ""),
     version="1.0.0",
     lifespan=lifespan,
 )

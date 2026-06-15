@@ -1,4 +1,3 @@
-// src/lib/api/auth.api.ts
 import apiClient from "./client";
 
 export const login = async (email: string, password: string) => {
@@ -10,8 +9,4 @@ export const login = async (email: string, password: string) => {
 export const logout = () => {
   localStorage.removeItem("access_token");
   localStorage.removeItem("user_role");
-};
-
-export const logout = () => {
-  localStorage.removeItem("access_token");
 };
